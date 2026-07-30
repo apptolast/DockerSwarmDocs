@@ -2,8 +2,8 @@
 title: "Estado observado del servidor Swarm"
 type: infrastructure
 owner: PabloHurtadoGonzalo86
-source-of-truth: "docker node ls; docker service ls (ejecutados en 159.195.156.57); apptolast/DockerSwarmInfrastrcture README.md sección 'Estado observado' y docs/DEPLOYMENT_STATUS.md"
-last-verified: 2026-07-28
+source-of-truth: "docker node ls; docker service ls (ejecutados en 159.195.156.57); apptolast/DockerSwarmInfrastrcture README.md sección 'Estado observado' y docs/DEPLOYMENT_STATUS.md, re-verificado en commit 45249ebb"
+last-verified: 2026-07-30
 tags:
   - swarm
   - estado
@@ -113,6 +113,9 @@ fuente en la fecha indicada en `last-verified`.
 - 2026-07-28 — `docs/DEPLOYMENT_STATUS.md` sustituye a esa sección tras el
   primer despliegue productivo real.
 - 2026-07-28 — Esta página creada, citando ambas instantáneas.
+- 2026-07-30 — Re-verificada contra el commit `45249ebb` de
+  `DockerSwarmInfrastrcture`: `README.md` y `docs/DEPLOYMENT_STATUS.md`
+  conservan el mismo contenido citado arriba, sin cambios.
 
 ## Referencias
 

@@ -2,8 +2,8 @@
 title: "Introducción a DockerSwarm Docs"
 type: architecture
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture, README.md y CLAUDE.md (raíz del repo)"
-last-verified: 2026-07-28
+source-of-truth: "apptolast/DockerSwarmInfrastrcture, README.md y CLAUDE.md (raíz del repo), commit 45249ebb"
+last-verified: 2026-07-30
 tags:
   - swarm
   - arquitectura
@@ -20,6 +20,9 @@ see-also:
   - "infrastructure:estado-observado"
   - "policy:compuertas-abiertas"
   - "architecture:agentes-operadores"
+  - "service:catalogo-servicios"
+  - "runbook:diagnosticos-conocidos"
+  - "network:topologia-red"
 sidebar_position: 1
 ---
 
@@ -104,12 +107,24 @@ propietario).
   bloquean pasos productivos concretos (cutover DNS, backups, etc.).
 - [Agentes operadores](./agentes-operadores.md) — los tres agentes Claude Code
   que aplican cambios sobre este servidor con disciplina check-then-apply.
+- [Catálogo de servicios](./catalogo-servicios.md) — los servicios aprobados
+  para la migración, sus hostnames/puertos y las exclusiones explícitas.
+- [Diagnósticos conocidos](./diagnosticos-conocidos.md) — entradas de log y
+  fallos "esperados" de Docker, Traefik y `sudo-rs`, con su causa raíz.
+- [Topología de red y aislamiento de edge](./topologia-red.md) — el
+  contrato de red de `config/platform.yml` y cómo Traefik aísla cada
+  workload.
 
 ## Histórico relevante
 
 - 2026-07-28 — Página creada como parte de la primera versión (seed) de
   `DockerSwarmDocs`, verificada contra el commit `854e160a` de
   `DockerSwarmInfrastrcture`.
+- 2026-07-30 — Primera ejecución real de extracción de
+  `apptolast/DockerSwarmMemoria`: se añaden tres páginas nuevas (catálogo
+  de servicios, diagnósticos conocidos, topología de red) y se re-verifica
+  el contenido de esta página y de las tres páginas del seed contra el
+  commit `45249ebb`, sin encontrar cambios respecto a lo ya documentado.
 
 ## Referencias
 
