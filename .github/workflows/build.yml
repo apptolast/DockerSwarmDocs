@@ -18,7 +18,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -27,6 +27,8 @@ jobs:
       - name: Build site
         run: npm run build
 
-  # Este workflow solo verifica que el sitio compila. NO despliega a GitHub
-  # Pages ni a ningún otro sitio: la publicación es una decisión aparte del
-  # propietario del repositorio (ver README.md).
+  # Este workflow solo verifica que el sitio compila (Astro/Starlight, via
+  # `npm run build` -> `astro build`). NO despliega a GitHub Pages: eso lo
+  # hace .github/workflows/deploy.yml, que solo se dispara en push a `main`,
+  # nunca en pull_request, para que una PR nunca publique contenido sin
+  # fusionar (ver README.md).

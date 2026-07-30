@@ -23,7 +23,8 @@ see-also:
   - "infrastructure:estado-observado"
   - "architecture:agentes-operadores"
   - "service:catalogo-servicios"
-sidebar_position: 7
+sidebar:
+  order: 7
 ---
 
 # Topología de red y aislamiento de edge
@@ -35,14 +36,14 @@ manager/worker, con un contrato de red y edge declarado en
 `config/platform.yml` y aplicado mediante Ansible/Traefik. Esta página
 documenta el contrato y los invariantes de topología y aislamiento tal como
 están codificados en el repositorio fuente — no el estado aplicado en un
-momento dado (para eso, ver [Estado observado](./estado-observado.md), que
+momento dado (para eso, ver [Estado observado](../estado-observado/), que
 ya sustituye la instantánea de "Estado aplicado actual" de 26 de julio de
 2026 de `docs/ARCHITECTURE.md` por la más reciente de
 `docs/DEPLOYMENT_STATUS.md`).
 
 ## Contrato compartido (`config/platform.yml`)
 
-{/* markdownlint-disable MD013 */}
+<!-- markdownlint-disable MD013 -->
 
 | Campo | Valor |
 | --- | --- |
@@ -52,16 +53,23 @@ ya sustituye la instantánea de "Estado aplicado actual" de 26 de julio de
 | Swarm | `10.0.0.0/8`, subredes `/24`, data path `4789/UDP` |
 | Instalación/estado | `/opt/dockerswarm`, `/srv/dockerswarm` |
 | TCP contractual | `80`, `443`, `25565` |
-| Gate Minecraft | `false` |
+| Gate Minecraft | `true` |
 | Zona | `apptolast.com` |
 
-{/* markdownlint-enable MD013 */}
+<!-- markdownlint-enable MD013 -->
 
 `25565` (Minecraft) está en la allowlist coherente de las tres capas
-(Terraform, Ansible, catálogo), pero permanece efectivamente cerrado porque
-el gate explícito `platform_minecraft_public_enabled` es `false`. Cambiarlo
-exige una decisión revisada; un `tfvars` no puede ampliar la exposición por
-sí solo.
+(Terraform, Ansible, catálogo). El gate explícito
+`platform_minecraft_public_enabled` es `true` desde el commit
+`08cace61` ("feat: publish minecraft behind an explicit offline-mode
+acceptance", 2026-07-28), acompañado de
+`platform_minecraft_offline_public_accepted: true` — una aceptación
+explícita, codificada y auditable del riesgo de exponer
+`online_mode: false` (`config/minecraft.yml`), según el propio comentario
+de `config/platform.yml`, no una activación implícita. Que el gate
+declarado esté abierto no implica por sí solo que el estado aplicado en
+`159.195.156.57` ya publique el puerto; para eso ver
+[Estado observado](../estado-observado/).
 
 Invariantes declarados: ningún secreto entra en Git; un recurso tiene un
 único writer; import/adopción precede a cualquier cambio de recurso
@@ -101,7 +109,7 @@ En vez de una overlay compartida, el contrato crea:
 La configuración dinámica de Traefik declara exactamente estas rutas:
 `/ping` de `edge.apptolast.com`, Kropia, Minecraft Stats, n8n, OpenClaw
 limpio, Passbolt, el portfolio de Pablo, el portfolio de Alberto, y Shlink
-(ver [Catálogo de servicios](./catalogo-servicios.md) para el detalle de
+(ver [Catálogo de servicios](../catalogo-servicios/) para el detalle de
 cada uno). Minecraft no pasa por Traefik en ningún caso; su publicación TCP
 directa sigue desactivada por el gate descrito arriba.
 
@@ -113,7 +121,7 @@ directa sigue desactivada por el gate descrito arriba.
   `DockerSwarmInfrastrcture`. La sección "Estado aplicado actual" de ese
   mismo fichero (fechada 26 de julio de 2026) queda deliberadamente fuera
   de esta página por estar superada por `docs/DEPLOYMENT_STATUS.md`, ya
-  documentado en [Estado observado](./estado-observado.md).
+  documentado en [Estado observado](../estado-observado/).
 
 ## Referencias
 

@@ -23,7 +23,8 @@ see-also:
   - "service:catalogo-servicios"
   - "runbook:diagnosticos-conocidos"
   - "network:topologia-red"
-sidebar_position: 1
+sidebar:
+  order: 1
 ---
 
 # Introducción a DockerSwarm Docs
@@ -101,17 +102,17 @@ propietario).
 
 ## Páginas de este sitio
 
-- [Estado observado](./estado-observado.md) — instantánea verificable del
+- [Estado observado](../estado-observado/) — instantánea verificable del
   estado real del servidor.
-- [Compuertas abiertas](./compuertas-abiertas.md) — condiciones externas que
+- [Compuertas abiertas](../compuertas-abiertas/) — condiciones externas que
   bloquean pasos productivos concretos (cutover DNS, backups, etc.).
-- [Agentes operadores](./agentes-operadores.md) — los tres agentes Claude Code
+- [Agentes operadores](../agentes-operadores/) — los tres agentes Claude Code
   que aplican cambios sobre este servidor con disciplina check-then-apply.
-- [Catálogo de servicios](./catalogo-servicios.md) — los servicios aprobados
+- [Catálogo de servicios](../catalogo-servicios/) — los servicios aprobados
   para la migración, sus hostnames/puertos y las exclusiones explícitas.
-- [Diagnósticos conocidos](./diagnosticos-conocidos.md) — entradas de log y
+- [Diagnósticos conocidos](../diagnosticos-conocidos/) — entradas de log y
   fallos "esperados" de Docker, Traefik y `sudo-rs`, con su causa raíz.
-- [Topología de red y aislamiento de edge](./topologia-red.md) — el
+- [Topología de red y aislamiento de edge](../topologia-red/) — el
   contrato de red de `config/platform.yml` y cómo Traefik aísla cada
   workload.
 

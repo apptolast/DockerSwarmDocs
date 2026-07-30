@@ -22,7 +22,8 @@ see-also:
   - "architecture:introduccion"
   - "infrastructure:estado-observado"
   - "architecture:agentes-operadores"
-sidebar_position: 6
+sidebar:
+  order: 6
 ---
 
 # Diagnósticos conocidos: Docker, Traefik y sudo-rs
