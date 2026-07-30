@@ -19,7 +19,8 @@ related-alerts: []
 see-also:
   - "architecture:introduccion"
   - "policy:compuertas-abiertas"
-sidebar_position: 2
+sidebar:
+  order: 2
 ---
 
 # Estado observado del servidor Swarm
@@ -70,7 +71,7 @@ Pendiente, según la misma fuente:
   reinicio destruyen contenedores entre el listado y la inspección.
 - El backup permanece bloqueado (custodio externo de la unlock key y bucket
   R2 con credencial propia pendientes); ver
-  [Compuertas abiertas](./compuertas-abiertas.md).
+  [Compuertas abiertas](../compuertas-abiertas/).
 - **No debe ejecutarse Terraform contra el root `cloudflare/apptolast-dns`**:
   en modo `initialize` fuerza `adoption_only=true`, lo que devolvería los
   nueve registros A a `138.199.157.58` (un servidor que ya no existe),

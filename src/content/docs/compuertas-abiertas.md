@@ -21,7 +21,8 @@ see-also:
   - "architecture:introduccion"
   - "infrastructure:estado-observado"
   - "architecture:agentes-operadores"
-sidebar_position: 3
+sidebar:
+  order: 3
 ---
 
 # Compuertas externas abiertas y STOP gates
@@ -117,7 +118,7 @@ documentos.
 
 Si una tarea parece requerir cruzar cualquiera de estas compuertas —incluida
 la de cutover DNS—, la actuación correcta (documentada en el propio repo
-fuente, ver [Agentes operadores](./agentes-operadores.md)) es parar y
+fuente, ver [Agentes operadores](../agentes-operadores/)) es parar y
 reportarlo explícitamente al propietario, nunca inventar un valor, una
 credencial o un flag de bypass para forzar una ejecución en verde.
 

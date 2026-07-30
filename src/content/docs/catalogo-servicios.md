@@ -21,7 +21,8 @@ see-also:
   - "architecture:introduccion"
   - "infrastructure:estado-observado"
   - "policy:compuertas-abiertas"
-sidebar_position: 5
+sidebar:
+  order: 5
 ---
 
 # Catálogo de servicios aprobados
@@ -53,7 +54,7 @@ evidencia de origen procede de una auditoría de `MigracionNetCup` fechada el
 
 ## Servicios aprobados
 
-{/* markdownlint-disable MD013 */}
+<!-- markdownlint-disable MD013 -->
 
 | ID | Estrategia | Hostname | Puerto objetivo | Datos confirmados |
 | --- | --- | --- | --- | --- |
@@ -68,7 +69,7 @@ evidencia de origen procede de una auditoría de `MigracionNetCup` fechada el
 | `personal-website-pablo` | Redeploy | `pablohurtadohg.apptolast.com` | Edge `3000/TCP` | Imagen y working tree capturado |
 | `shlink` | Restore | `generadorcodigosqr.apptolast.com` | Edge `8080/TCP` | PostgreSQL |
 
-{/* markdownlint-enable MD013 */}
+<!-- markdownlint-enable MD013 -->
 
 La auditoría de origen restauró 46 workflows y 35 credenciales de n8n, y
 confirmó unos 3,76 GB de PostgreSQL y unos 72 MB en su home. Esas cifras son
@@ -77,7 +78,7 @@ criterios de reconciliación, no límites del esquema.
 `25565/TCP` (Minecraft) forma parte del alcance aprobado, pero sigue sujeto a
 restauración, prueba, y a una decisión explícita sobre `online-mode=false`
 antes de cambiar `platform_minecraft_public_enabled` y abrir firewall/DNS
-(ver [Compuertas abiertas](./compuertas-abiertas.md)). El hostname de Traefik
+(ver [Compuertas abiertas](../compuertas-abiertas/)). El hostname de Traefik
 expone únicamente el health endpoint versionado (`/ping`); no autoriza un
 dashboard público.
 

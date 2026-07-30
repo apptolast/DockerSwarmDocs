@@ -1,8 +1,8 @@
 # DockerSwarmDocs
 
 Sitio de documentación de la infraestructura Docker Swarm de producción de
-`apptolast`. Construido con [Docusaurus](https://docusaurus.io/) (preset
-`classic`, JavaScript).
+`apptolast`. Construido con [Starlight](https://starlight.astro.build/)
+(framework [Astro](https://astro.build/)).
 
 ## Qué es este repo
 
@@ -13,12 +13,13 @@ siendo, siempre,
 un clúster Docker Swarm de un solo nodo).
 
 `DockerSwarmDocs` es una capa de documentación **navegable** sobre esa
-fuente de verdad: páginas Markdown bajo [`docs/`](docs/), cada una con un
-frontmatter YAML citable (`title`, `type`, `owner`, `source-of-truth`,
-`last-verified`, `tags`, `status`, `superseded-by`, y las listas de
-relaciones `depends-on`/`used-by`/`related-runbooks`/`related-dashboards`/
-`related-alerts`/`see-also`), navegable por tags como cualquier sitio
-Docusaurus.
+fuente de verdad: páginas Markdown bajo
+[`src/content/docs/`](src/content/docs/), cada una con un frontmatter YAML
+citable (`title`, `type`, `owner`, `source-of-truth`, `last-verified`,
+`tags`, `status`, `superseded-by`, y las listas de relaciones
+`depends-on`/`used-by`/`related-runbooks`/`related-dashboards`/
+`related-alerts`/`see-also`), validado en build por el schema de
+`src/content.config.ts`.
 
 ## Estado actual: contenido sembrado a mano, no autogenerado
 
@@ -40,19 +41,19 @@ fecha: este repo se crea como el punto de partida sobre el que trabajaría.
 
 ## Compatibilidad con el futuro RAG central
 
-El frontmatter de cada página de `docs/` sigue, campo a campo, la plantilla
+El frontmatter de cada página de `src/content/docs/` sigue, campo a campo, la plantilla
 obligatoria de
 [`apptolast/sistema-central-admin-servidor`](https://github.com/apptolast/sistema-central-admin-servidor)
 (`docs/_template.md`), que gobierna el "segundo cerebro" RAG que esa
 plataforma (hoy centrada en el clúster Kubernetes de Hetzner, Fase 0) está
 construyendo para toda la infraestructura de `apptolast`. La intención
 explícita es que, si ese RAG central se extiende algún día a cubrir también
-este servidor Swarm, pueda ingerir el contenido de `docs/` de este repo sin
-necesidad de reescribirlo.
+este servidor Swarm, pueda ingerir el contenido de `src/content/docs/` de
+este repo sin necesidad de reescribirlo.
 
 Esto implica, en particular:
 
-- Toda página factual bajo `docs/` lleva el frontmatter obligatorio completo
+- Toda página factual bajo `src/content/docs/` lleva el frontmatter obligatorio completo
   (ver arriba), incluyendo un `source-of-truth` verificable y una fecha
   `last-verified`.
 - Ningún dato factual se inventa: si algo no se pudo confirmar contra
@@ -63,31 +64,42 @@ Esto implica, en particular:
   más reciente sustituye a cuál, como ocurre entre `README.md` y
   `docs/DEPLOYMENT_STATUS.md` de `DockerSwarmInfrastrcture`).
 
-## Despliegue: pendiente de decisión
+## Despliegue: GitHub Pages
 
-Este sitio **no está desplegado en ningún dominio todavía**. No hay GitHub
-Pages, ni DNS, ni Traefik apuntando a él. El workflow de CI de este repo
-(`.github/workflows/build.yml`) solo comprueba que el sitio compila en cada
-push/PR a `main`; no publica nada en ningún sitio. Publicarlo (dónde, con
-qué dominio, con qué mecanismo) es una decisión aparte que corresponde al
-propietario del repositorio.
+Este sitio se publica en **GitHub Pages** en
+<https://apptolast.github.io/DockerSwarmDocs/>. Hay dos workflows de CI
+separados en `.github/workflows/`:
+
+- `build.yml`: se dispara en cada push/PR a `main`, solo compila el sitio
+  (job/check `build`), sin desplegar nada. Así una PR de un bot contra
+  `main` nunca publica contenido todavía sin fusionar.
+- `deploy.yml`: se dispara solo en cada push a `main` (nunca en
+  pull_request), compila de nuevo y despliega a GitHub Pages mediante
+  `actions/deploy-pages`.
+
+Nota operativa: publicar requiere que **Settings → Pages → Source** esté
+puesto en `GitHub Actions` en la configuración del repo (paso único,
+manual o vía API, independiente de este workflow).
 
 ## Desarrollo local
 
 ```bash
 npm install
-npm run start   # servidor de desarrollo en http://localhost:3000
-npm run build   # build de producción en build/, sin desplegar nada
+npm run start   # servidor de desarrollo en http://localhost:4321
+npm run build   # build de producción en dist/
 ```
 
 ## Estructura
 
 ```text
 .
-├── docs/                   páginas de documentación (frontmatter obligatorio)
-├── src/                    tema/páginas React de Docusaurus
-├── static/                 activos estáticos
-├── docusaurus.config.js    configuración del sitio
-├── sidebars.js             sidebar de docs/ (autogenerado por carpeta)
-└── .github/workflows/      CI: build (no despliega)
+├── src/
+│   ├── content/
+│   │   ├── docs/            páginas de documentación (frontmatter obligatorio)
+│   │   └── docs/index.md    portada del sitio (template splash)
+│   ├── content.config.ts    schema de frontmatter (docsSchema + extend)
+│   └── assets/              logo y demás activos optimizables por Astro
+├── public/                  activos estáticos servidos tal cual (favicon)
+├── astro.config.mjs         configuración del sitio, sidebar, i18n, site/base
+└── .github/workflows/       CI: build (siempre) + deploy a Pages (push a main)
 ```

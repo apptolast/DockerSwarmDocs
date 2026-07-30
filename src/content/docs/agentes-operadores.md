@@ -21,7 +21,8 @@ related-alerts: []
 see-also:
   - "architecture:introduccion"
   - "infrastructure:estado-observado"
-sidebar_position: 4
+sidebar:
+  order: 4
 ---
 
 # Agentes operadores (`.claude/agents/`)
@@ -34,7 +35,7 @@ como ficheros Markdown con frontmatter en
 `.claude/agents/{ansible-operator,iac-validator,terraform-operator}.md` del
 repositorio fuente. Los tres comparten la misma disciplina: nunca inventan un
 bypass, siempre validan antes de aplicar (check-then-apply), y ante una
-compuerta STOP (ver [Compuertas abiertas](./compuertas-abiertas.md)) reportan
+compuerta STOP (ver [Compuertas abiertas](../compuertas-abiertas/)) reportan
 el bloqueo en vez de rodearlo.
 
 ## `ansible-operator`
@@ -98,7 +99,7 @@ herramientas propias del repo (`scripts/plan-terraform.sh`,
 - Respeta sin excepción los STOP gates que codifica
   `scripts/terraform-safety.py` y los wrappers del repo, entre ellos el
   bloqueo incondicional del cutover DNS hacia la IP de plataforma (ver
-  [Compuertas abiertas](./compuertas-abiertas.md)) y la prohibición de
+  [Compuertas abiertas](../compuertas-abiertas/)) y la prohibición de
   aplicar/migrar el root `cloudflare/state-bootstrap` (backend local sin
   contrato de cuarentena post-writer).
 - Ante credenciales ausentes o fuera de alcance, lo reporta como bloqueo, no
