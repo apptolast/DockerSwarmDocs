@@ -42,7 +42,7 @@ ya sustituye la instantánea de "Estado aplicado actual" de 26 de julio de
 
 ## Contrato compartido (`config/platform.yml`)
 
-<!-- markdownlint-disable MD013 -->
+{/* markdownlint-disable MD013 */}
 
 | Campo | Valor |
 | --- | --- |
@@ -55,7 +55,7 @@ ya sustituye la instantánea de "Estado aplicado actual" de 26 de julio de
 | Gate Minecraft | `false` |
 | Zona | `apptolast.com` |
 
-<!-- markdownlint-enable MD013 -->
+{/* markdownlint-enable MD013 */}
 
 `25565` (Minecraft) está en la allowlist coherente de las tres capas
 (Terraform, Ansible, catálogo), pero permanece efectivamente cerrado porque

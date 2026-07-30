@@ -53,7 +53,7 @@ evidencia de origen procede de una auditoría de `MigracionNetCup` fechada el
 
 ## Servicios aprobados
 
-<!-- markdownlint-disable MD013 -->
+{/* markdownlint-disable MD013 */}
 
 | ID | Estrategia | Hostname | Puerto objetivo | Datos confirmados |
 | --- | --- | --- | --- | --- |
@@ -68,7 +68,7 @@ evidencia de origen procede de una auditoría de `MigracionNetCup` fechada el
 | `personal-website-pablo` | Redeploy | `pablohurtadohg.apptolast.com` | Edge `3000/TCP` | Imagen y working tree capturado |
 | `shlink` | Restore | `generadorcodigosqr.apptolast.com` | Edge `8080/TCP` | PostgreSQL |
 
-<!-- markdownlint-enable MD013 -->
+{/* markdownlint-enable MD013 */}
 
 La auditoría de origen restauró 46 workflows y 35 credenciales de n8n, y
 confirmó unos 3,76 GB de PostgreSQL y unos 72 MB en su home. Esas cifras son
