@@ -52,16 +52,23 @@ ya sustituye la instantánea de "Estado aplicado actual" de 26 de julio de
 | Swarm | `10.0.0.0/8`, subredes `/24`, data path `4789/UDP` |
 | Instalación/estado | `/opt/dockerswarm`, `/srv/dockerswarm` |
 | TCP contractual | `80`, `443`, `25565` |
-| Gate Minecraft | `false` |
+| Gate Minecraft | `true` |
 | Zona | `apptolast.com` |
 
 {/* markdownlint-enable MD013 */}
 
 `25565` (Minecraft) está en la allowlist coherente de las tres capas
-(Terraform, Ansible, catálogo), pero permanece efectivamente cerrado porque
-el gate explícito `platform_minecraft_public_enabled` es `false`. Cambiarlo
-exige una decisión revisada; un `tfvars` no puede ampliar la exposición por
-sí solo.
+(Terraform, Ansible, catálogo). El gate explícito
+`platform_minecraft_public_enabled` es `true` desde el commit
+`08cace61` ("feat: publish minecraft behind an explicit offline-mode
+acceptance", 2026-07-28), acompañado de
+`platform_minecraft_offline_public_accepted: true` — una aceptación
+explícita, codificada y auditable del riesgo de exponer
+`online_mode: false` (`config/minecraft.yml`), según el propio comentario
+de `config/platform.yml`, no una activación implícita. Que el gate
+declarado esté abierto no implica por sí solo que el estado aplicado en
+`159.195.156.57` ya publique el puerto; para eso ver
+[Estado observado](./estado-observado.md).
 
 Invariantes declarados: ningún secreto entra en Git; un recurso tiene un
 único writer; import/adopción precede a cualquier cambio de recurso
