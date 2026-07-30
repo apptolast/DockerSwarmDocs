@@ -2,8 +2,8 @@
 title: "Agentes operadores (.claude/agents/)"
 type: architecture
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture .claude/agents/ansible-operator.md, .claude/agents/iac-validator.md, .claude/agents/terraform-operator.md"
-last-verified: 2026-07-28
+source-of-truth: "apptolast/DockerSwarmInfrastrcture .claude/agents/ansible-operator.md, .claude/agents/iac-validator.md, .claude/agents/terraform-operator.md, re-verificado en commit 45249ebb"
+last-verified: 2026-07-30
 tags:
   - ansible
   - terraform
@@ -132,6 +132,9 @@ comparten estas reglas, sin excepción documentada:
   observada).
 - 2026-07-28 — Esta página creada, verificada contra el contenido actual de
   los tres ficheros.
+- 2026-07-30 — Re-verificada contra el commit `45249ebb` de
+  `DockerSwarmInfrastrcture`: los tres ficheros de agente conservan el
+  mismo contenido citado arriba, sin cambios.
 
 ## Referencias
 

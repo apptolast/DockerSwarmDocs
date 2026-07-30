@@ -2,8 +2,8 @@
 title: "Compuertas externas abiertas y STOP gates"
 type: policy
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture README.md sección 'Compuertas externas abiertas' y CLAUDE.md sección 'Open STOP gates'"
-last-verified: 2026-07-27
+source-of-truth: "apptolast/DockerSwarmInfrastrcture README.md sección 'Compuertas externas abiertas' y CLAUDE.md sección 'Open STOP gates', re-verificado en commit 45249ebb"
+last-verified: 2026-07-30
 tags:
   - seguridad
   - dns
@@ -128,6 +128,10 @@ credencial o un flag de bypass para forzar una ejecución en verde.
   credencial; coordinador de host-readiness añadido para el gate de cutover
   DNS. `CLAUDE.md` documenta el listado actualizado de "Open STOP gates".
 - 2026-07-28 — Esta página creada, citando ambas fuentes.
+- 2026-07-30 — Re-verificada contra el commit `45249ebb` de
+  `DockerSwarmInfrastrcture`: el listado de "Open STOP gates" de
+  `CLAUDE.md` y la sección "Compuertas externas abiertas" de `README.md`
+  conservan el mismo contenido citado arriba, sin cambios.
 
 ## Referencias
 
