@@ -10,7 +10,7 @@ hero:
     apptolast
   actions:
     - text: Leer la introducción
-      link: /introduccion/
+      link: ./introduccion/
       icon: right-arrow
     - text: DockerSwarmInfrastrcture (fuente)
       link: https://github.com/apptolast/DockerSwarmInfrastrcture
@@ -26,8 +26,8 @@ documentación (no un resumen desechable): cada página factual lleva
 metadatos citables (frontmatter) para que, el día de mañana, un sistema de
 recuperación aumentada (RAG) pueda ingerirla sin reescritura.
 
-Empieza por la [introducción](/introduccion/), revisa el
-[estado observado](/estado-observado/) del servidor, las
-[compuertas externas abiertas](/compuertas-abiertas/) y los
-[agentes operadores](/agentes-operadores/) que aplican los cambios con
+Empieza por la [introducción](./introduccion/), revisa el
+[estado observado](./estado-observado/) del servidor, las
+[compuertas externas abiertas](./compuertas-abiertas/) y los
+[agentes operadores](./agentes-operadores/) que aplican los cambios con
 disciplina check-then-apply.
