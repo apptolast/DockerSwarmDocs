@@ -2,7 +2,7 @@
 title: "Topología de red y aislamiento de edge"
 type: network
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/ARCHITECTURE.md secciones 'Contrato compartido', 'Topología' y 'Aislamiento de red y edge'; config/platform.yml, commit 45249ebb"
+source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/ARCHITECTURE.md secciones 'Contrato compartido', 'Topología' y 'Aislamiento de red y edge'; config/platform.yml, commit 45249ebb; ansible/roles/host_baseline/defaults/main.yml, ansible/roles/host_baseline/tasks/crowdsec-docker.yml, ansible/roles/host_baseline/templates/crowdsec-ipset-ready.sh.j2, ansible/roles/host_baseline/templates/docker-firewall-crowdsec.conf.j2, ansible/roles/platform/files/dockerswarm-docker-firewall.service, tests/test_crowdsec_ipset_ready.py, commits 501e6ea y 54cb10a"
 last-verified: 2026-07-30
 tags:
   - swarm
@@ -10,6 +10,7 @@ tags:
   - traefik
   - arquitectura
   - seguridad
+  - crowdsec
 status: stable
 superseded-by: null
 depends-on:
@@ -113,6 +114,52 @@ limpio, Passbolt, el portfolio de Pablo, el portfolio de Alberto, y Shlink
 cada uno). Minecraft no pasa por Traefik en ningún caso; su publicación TCP
 directa sigue desactivada por el gate descrito arriba.
 
+## Orden de arranque: CrowdSec antes que el firewall de Docker
+
+El rol `host_baseline` instala en `dockerswarm-docker-firewall.service`
+(descrito arriba) un *drop-in* systemd
+(`/etc/systemd/system/dockerswarm-docker-firewall.service.d/20-crowdsec-order.conf`,
+plantilla `docker-firewall-crowdsec.conf.j2`) con dos hooks en orden fijo:
+
+1. `ExecStartPre` ejecuta un script nuevo
+   (`host_baseline_crowdsec_ipset_wait_script`, instalado en
+   `/usr/local/sbin/dockerswarm-wait-for-crowdsec-ipsets` desde la
+   plantilla `crowdsec-ipset-ready.sh.j2`) que sondea `ipset list -n` cada
+   segundo hasta encontrar al menos un ipset `crowdsec-blacklists-<N>`
+   (IPv4) y uno `crowdsec6-blacklists-<N>` (IPv6), o agota un timeout
+   configurable (`host_baseline_crowdsec_ipset_wait_timeout_seconds`,
+   90 segundos por defecto) y sale con error.
+2. `ExecStartPost` ejecuta el script ya existente que ordena las reglas
+   CrowdSec/Docker (`host_baseline_crowdsec_order_script`).
+
+El propio drop-in añade `CapabilityBoundingSet=CAP_NET_RAW` a la unidad.
+El objetivo declarado por el mensaje del commit que introdujo el script de
+espera ("Wait for CrowdSec ipsets before Docker firewall") es evitar que
+el firewall de Docker quede activo antes de que existan los ipsets que
+CrowdSec usa para bloquear IPs, cerrando una ventana de arranque sin ese
+filtrado — el mecanismo concreto (el propio script y su timeout) está
+verificado contra el fichero fuente; la existencia de esa ventana de
+riesgo en producción antes del cambio es una lectura del mensaje del
+commit, no una medición directa: TODO: verificar con un log de arranque
+real si esa ventana llegó a manifestarse.
+
+Por separado, la propia unidad `dockerswarm-docker-firewall.service`
+(rol `platform`) pasó a declarar `Requires=docker.service`,
+`PartOf=docker.service` y `WantedBy=docker.service`, además de
+`After=docker.service network-online.target
+crowdsec-firewall-bouncer.service` — es decir, el firewall de Docker
+queda atado al ciclo de vida de `docker.service` en vez de administrarse
+como unidad independiente. Sigue siendo `Type=oneshot` con
+`RemainAfterExit=yes` y conserva `CapabilityBoundingSet=CAP_NET_ADMIN
+CAP_NET_RAW`.
+
+`tests/test_crowdsec_ipset_ready.py` (nuevo) verifica, contra las
+plantillas renderizadas y la unidad literal: que el script de espera
+acepta cuando existen ambas familias de ipsets, que falla con el mensaje
+esperado si falta la familia IPv6, que el `ExecStartPre` del drop-in
+precede siempre a su `ExecStartPost`, y que tanto la unidad como el
+drop-in conservan sus capacidades declaradas.
+
 ## Histórico relevante
 
 - 2026-07-30 — Esta página creada, verificada contra las secciones
@@ -122,8 +169,15 @@ directa sigue desactivada por el gate descrito arriba.
   mismo fichero (fechada 26 de julio de 2026) queda deliberadamente fuera
   de esta página por estar superada por `docs/DEPLOYMENT_STATUS.md`, ya
   documentado en [Estado observado](../estado-observado/).
+- 2026-07-30 — Añadida la sección "Orden de arranque: CrowdSec antes que
+  el firewall de Docker", verificada contra los commits `501e6ea` ("Wait
+  for CrowdSec ipsets before Docker firewall") y `54cb10a` ("Enable Docker
+  firewall with Docker service") de `DockerSwarmInfrastrcture`.
 
 ## Referencias
 
 - [`docs/ARCHITECTURE.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/docs/ARCHITECTURE.md)
 - [`config/platform.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/config/platform.yml)
+- [`ansible/roles/host_baseline/tasks/crowdsec-docker.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/ansible/roles/host_baseline/tasks/crowdsec-docker.yml)
+- [`ansible/roles/host_baseline/templates/crowdsec-ipset-ready.sh.j2`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/ansible/roles/host_baseline/templates/crowdsec-ipset-ready.sh.j2)
+- [`ansible/roles/platform/files/dockerswarm-docker-firewall.service`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/ansible/roles/platform/files/dockerswarm-docker-firewall.service)
