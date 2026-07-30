@@ -25,6 +25,21 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # actions/deploy-pages@v5 (its own latest release, no newer version
+      # exists that fixes this - checked github.com/actions/deploy-pages
+      # releases) internally emits a Node.js runtime deprecation warning
+      # for the built-in `punycode` module (DEP0040), from inside the
+      # action's own bundled dependencies - not something in this repo's
+      # code or config. NODE_OPTIONS=--no-deprecation is confirmed
+      # settable via the environment per Node's own docs
+      # (nodejs.org/api/cli.html#node_optionsoptions) and silences it.
+      # Trade-off, stated plainly: this suppresses ALL deprecation
+      # warnings for this one step's Node process, not just punycode -
+      # acceptable here since the step is a single third-party action
+      # with a single known warning source, but worth revisiting if
+      # actions/deploy-pages ever needs a different deprecation surfaced.
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+        env:
+          NODE_OPTIONS: --no-deprecation
