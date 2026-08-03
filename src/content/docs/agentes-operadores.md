@@ -2,14 +2,15 @@
 title: "Agentes operadores (.claude/agents/)"
 type: architecture
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture .claude/agents/ansible-operator.md, .claude/agents/iac-validator.md, .claude/agents/terraform-operator.md, re-verificado en commit 45249ebb"
-last-verified: 2026-07-30
+source-of-truth: "apptolast/DockerSwarmInfrastrcture .claude/agents/ansible-operator.md, .claude/agents/iac-validator.md, .claude/agents/terraform-operator.md, re-verificado en commit 45249ebb; .claude/agents/judge.md, .claude/agents/security-reviewer.md, .claude/agents/guardrail-adversary.md, .claude/agents/mentor.md y .github/workflows/guard-sensitive-paths.yml añadidos en commit 8a76620, re-verificado en ese mismo commit"
+last-verified: 2026-08-03
 tags:
   - ansible
   - terraform
   - seguridad
   - automatizacion
   - arquitectura
+  - revision
 status: stable
 superseded-by: null
 depends-on:
@@ -125,6 +126,61 @@ comparten estas reglas, sin excepción documentada:
   queda proceso controlador vivo) y el script correcto para ese tipo de
   marker.
 
+## Los cuatro revisores (`.claude/agents/`)
+
+Añadidos en el commit `8a76620` ("feat(agents): add the four reviewers and
+the sensitive-path guard (#10)", 2026-08-02). Antes de este commit el
+repositorio tenía tres operadores y ningún revisor (así lo dice el propio
+`.claude/agents/judge.md`: "Este repositorio tiene tres operadores... y
+ningún revisor. Tú eres el revisor."). Los cuatro comparten un rasgo con los
+operadores —disciplina fail-closed, cero flags de bypass, cero valores
+inventados— pero invierten el permiso de escritura: ninguno tiene `Write` ni
+`Edit`, por diseño deliberado y documentado, igual que ya declaraba
+`terraform-operator.md` de sí mismo.
+
+- **`judge`**: veredicto `APPROVED`/`CHANGES_REQUESTED` contra `CLAUDE.md`,
+  `.github/pull_request_template.md` y las compuertas STOP. Sin `Write`/
+  `Edit`; escribe su veredicto a `.build/review/` únicamente vía `Bash`
+  (heredoc), un directorio en `.gitignore` para no ensuciar el worktree que
+  los writers exigen limpio. Ejecuta la secuencia de validación
+  (`bootstrap-tooling.sh`, `validate-iac.sh`, `lint.sh`) como evidencia, pero
+  nunca corrige lo que encuentra: señala `fichero:línea` y deja el arreglo al
+  operador correspondiente.
+- **`security-reviewer`**: revisor de seguridad **obligatorio** (no opcional)
+  para todo diff que toque `ansible/`, `config/`, `scripts/`, `stacks/`,
+  `infra/terraform/`, `backup/`, `migration/` o `.claude/`. Recorre ocho ejes
+  fijos: cortafuegos (UFW/`DOCKER-USER`/CrowdSec), alta en el grupo `docker`,
+  política SSH staged/final y su rollback, escritura de secretos en claro,
+  ciclo de rotación crear-nuevo/repuntar/revocar-viejo, lectura TOCTOU-segura,
+  `allowed-signers`/atestación, y blast radius de `--check`/
+  `--confirm-production`. No repite lo que ya cubren `gitleaks`, `shellcheck`,
+  `markdownlint` ni `ansible-lint`.
+- **`guardrail-adversary`**: testing negativo de guardarrailes. Por cada gate
+  que un cambio toque, busca si existe un test que demuestre que el gate
+  **rechaza** la entrada mala (no solo que acepta la buena) y lista los
+  "supervivientes" — bypasses sin cobertura — citando el test exacto que
+  falta. Nunca escribe el test ni edita el gate para forzar un PASS.
+- **`mentor`**: el único de solo lectura estricta (`Read`/`Glob`/`Grep`, sin
+  `Bash`). Explica el porqué de las decisiones del repo (fail-closed, el
+  mutex host-global, el idiom TOCTOU, el orden CrowdSec/`DOCKERSWARM-INGRESS`,
+  las puertas STOP) citando `fichero:línea`, y remite a los otros agentes
+  cuando lo que hace falta es ejecutar algo, no entenderlo.
+
+**`.github/workflows/guard-sensitive-paths.yml`**: workflow (no agente) que
+etiqueta con `permissions-change` cualquier PR que toque una ruta sensible —
+el propio motor de CI (`scripts/bootstrap-tooling.sh`, `scripts/lint.sh`,
+`scripts/validate*`, `.ansible-lint`), el motor de operaciones peligrosas
+(`scripts/terraform-safety.py`, los scripts de lock/lease, `apply-terraform.sh`,
+`deploy-ansible.sh`), el contrato de producción (`config/`,
+`ansible/roles/host_security/`, `ansible/roles/host_baseline/`,
+`infra/terraform/`, `stacks/workloads/config/`), o el gobierno del propio
+repositorio (`.gitleaks.toml`, `.github/`, `.claude/`). Usa
+`pull_request_target` sin checkout ni ejecución de código del PR (solo pide
+por API la lista de nombres de fichero vía `gh api`), incluye
+`previous_filename` para que un rename no lo esquive, y nunca bloquea el
+check por sí mismo: la aplicación real es `.github/CODEOWNERS` más la
+protección de rama.
+
 ## Histórico relevante
 
 - 2026-07-27 — Los tres ficheros de agente (`ansible-operator.md`,
@@ -136,10 +192,21 @@ comparten estas reglas, sin excepción documentada:
 - 2026-07-30 — Re-verificada contra el commit `45249ebb` de
   `DockerSwarmInfrastrcture`: los tres ficheros de agente conservan el
   mismo contenido citado arriba, sin cambios.
+- 2026-08-02 — Añadidos los cuatro revisores (`judge`, `security-reviewer`,
+  `guardrail-adversary`, `mentor`) en `.claude/agents/` y el workflow
+  `.github/workflows/guard-sensitive-paths.yml`, verificado contra el commit
+  `8a76620` de `DockerSwarmInfrastrcture` ("feat(agents): add the four
+  reviewers and the sensitive-path guard (#10)"); `CHANGELOG.md`, sección
+  `### Added`, registra el mismo detalle.
 
 ## Referencias
 
 - [`.claude/agents/ansible-operator.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/.claude/agents/ansible-operator.md)
 - [`.claude/agents/iac-validator.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/.claude/agents/iac-validator.md)
 - [`.claude/agents/terraform-operator.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/.claude/agents/terraform-operator.md)
+- [`.claude/agents/judge.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/.claude/agents/judge.md)
+- [`.claude/agents/security-reviewer.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/.claude/agents/security-reviewer.md)
+- [`.claude/agents/guardrail-adversary.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/.claude/agents/guardrail-adversary.md)
+- [`.claude/agents/mentor.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/.claude/agents/mentor.md)
+- [`.github/workflows/guard-sensitive-paths.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/.github/workflows/guard-sensitive-paths.yml)
 - [`CLAUDE.md`, sección "Fail-closed philosophy"](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/CLAUDE.md)
