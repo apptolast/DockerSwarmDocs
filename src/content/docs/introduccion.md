@@ -2,8 +2,8 @@
 title: "Introducción a DockerSwarm Docs"
 type: architecture
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture, README.md y CLAUDE.md (raíz del repo), commit 45249ebb"
-last-verified: 2026-07-30
+source-of-truth: "apptolast/DockerSwarmInfrastrcture, README.md y CLAUDE.md (raíz del repo), commit 45249ebb; lista de páginas re-verificada tras la ejecución del 2026-08-03 (commit af05ec0)"
+last-verified: 2026-08-03
 tags:
   - swarm
   - arquitectura
@@ -115,6 +115,10 @@ propietario).
 - [Topología de red y aislamiento de edge](../topologia-red/) — el
   contrato de red de `config/platform.yml` y cómo Traefik aísla cada
   workload.
+- [Observabilidad de fallos de backup](../observabilidad-backup/) — la
+  corrección de la escritura de estado silenciosa y el hueco de alertas de
+  "estado obsoleto" que sigue abierto en tres de los cuatro tipos de
+  backup.
 
 ## Histórico relevante
 
@@ -126,6 +130,13 @@ propietario).
   de servicios, diagnósticos conocidos, topología de red) y se re-verifica
   el contenido de esta página y de las tres páginas del seed contra el
   commit `45249ebb`, sin encontrar cambios respecto a lo ya documentado.
+- 2026-08-03 — Nueva ejecución de extracción, rango `54cb10a..af05ec0` de
+  `DockerSwarmInfrastrcture`: se añade una página nueva (observabilidad de
+  backup) y se actualizan [Agentes operadores](../agentes-operadores/) (los
+  cuatro revisores y el guardián de rutas sensibles) y
+  [Compuertas abiertas](../compuertas-abiertas/) (revalidación completa de
+  las nueve compuertas del 2026-08-02, que corrige el estado de Minecraft y
+  del cutover DNS respecto a lo documentado hasta ahora).
 
 ## Referencias
 

@@ -2,8 +2,8 @@
 title: "Compuertas externas abiertas y STOP gates"
 type: policy
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture README.md sección 'Compuertas externas abiertas' y CLAUDE.md sección 'Open STOP gates', re-verificado en commit 45249ebb"
-last-verified: 2026-07-30
+source-of-truth: "apptolast/DockerSwarmInfrastrcture README.md sección 'Compuertas externas abiertas' y CLAUDE.md sección 'Open STOP gates', re-verificado en commit 45249ebb; revalidación completa de las nueve compuertas en CLAUDE.md sección 'Open STOP gates (revalidated 2026-08-02)', commit 8a76620"
+last-verified: 2026-08-03
 tags:
   - seguridad
   - dns
@@ -103,6 +103,89 @@ en el listado más breve de `README.md`.
   sirviendo) más el visto bueno explícito del propietario del repositorio,
   no solo la existencia del código.
 
+## Revalidación completa — 2 de agosto de 2026
+
+`CLAUDE.md` fue revalidado por completo el 2026-08-02 contra el worktree en
+el commit `8a76620` (48 commits después de `d461e13`, el commit que había
+dejado el listado anterior desactualizado por construcción). Esta
+revalidación numera explícitamente las nueve compuertas, con una etiqueta
+por cada una (`OPEN`, `CLOSED` o `PREMISE OBSOLETE`), y advierte además que
+**no** debe revalidarse contra `README.md`, `docs/MIGRATION.md`,
+`docs/BACKUP_RECOVERY.md` ni `migration/RUNTIME_GENERATION_PROMOTION.md`:
+ninguno de esos ficheros se ha tocado desde `63dd546` (2026-07-27) y hoy
+contradicen el estado real (por ejemplo, `README.md` sigue afirmando
+`platform_minecraft_public_enabled: false` mientras `config/platform.yml`
+ya dice `true`).
+
+Dos de las nueve compuertas cambian de estado respecto al listado de
+2026-07-27 de la sección anterior — y una de ellas contradice directamente
+lo que esta misma página venía afirmando:
+
+1. **Backend de state remoto (R2) — sigue OPEN.** Ya no hace falta
+   "credenciales separadas": el propietario autorizó una única credencial
+   R2 de cuenta que cubre los tres buckets
+   (`infra/terraform/backend-identities.json`, mismo
+   `access_key_id_sha256` en los tres roots). Faltan, verificado: el
+   fichero real `infra/terraform/snapshot-recipients.json` (solo existe su
+   `.example`) y la prueba de locking en vivo contra R2 real.
+2. **Identidades de firma — sigue OPEN.** Cuatro registros de confianza
+   (`*.allowed-signers`) ya existen con claves `ssh-ed25519` reales y un
+   namespace restringido. Faltan, no verificable desde el repo: las claves
+   privadas (fuera de git, bajo `/etc/dockerswarm/`) y cualquier firma real
+   de plan o de lock-proof observable.
+3. **Token Cloudflare Terraform / credencial ACME — sigue OPEN.** Sin
+   cambio en la reutilización del token ya documentada. Novedad: la
+   condición que el propio repo fijaba para revocar
+   `cloudflare_dns_api_token_v1` ("revocar tras verificar `v2` en
+   servicio") **ya se cumplió** — 9 de 9 certificados emitidos por Let's
+   Encrypt producción (`docs/DEPLOYMENT_STATUS.md`) —, así que solo falta
+   la revocación en sí, una acción del propietario en Cloudflare.
+4. **Credenciales Netcup — sigue OPEN,** sin cambios de fondo.
+5. **Custodio externo de la unlock key — sigue OPEN,** sin cambios de
+   fondo; el backup sigue bloqueado por esto (ver
+   [Estado observado](../estado-observado/)).
+6. **Aceptación OAuth/negocio de n8n — sigue OPEN,** sin cambios de fondo.
+   Matiz explícito de la revalidación: que n8n sirva tráfico real no cierra
+   esta compuerta — la aceptación pendiente es sobre publicar los 46
+   workflows restaurados, no sobre levantar el servicio.
+7. **Decisión sobre Minecraft (`online-mode=false`) — pasa a CLOSED,**
+   cerrada por el commit `08cace6` (2026-07-28):
+   `config/platform.yml` declara `platform_minecraft_offline_public_accepted:
+   true` junto con `platform_minecraft_public_enabled: true`. **Esto
+   contradice la lista de 2026-07-27 de la sección anterior de esta misma
+   página**, que listaba esta decisión como pendiente — y coincide con lo
+   que [Topología de red](../topologia-red/) ya documentaba desde su
+   creación (2026-07-30) sin que esta página se hubiera actualizado en
+   consecuencia. La compuerta en sí no se eliminó: su valor por defecto
+   sigue siendo `false` y sigue comprobándose en tres sitios distintos del
+   repo; lo que cambió es que el riesgo ya fue aceptado explícitamente.
+8. **Snapshot de migración o promoción versionada — sigue OPEN,** y su
+   premisa temporal ("antes de arrancar workloads") ya se sobrepasó sin
+   cerrarse: `docs/DEPLOYMENT_STATUS.md` registra 11 de 16 servicios Swarm
+   en `1/1` desde el 2026-07-28, sin que se documentara ninguna de las dos
+   condiciones que exige `docs/MIGRATION.md`. Que los servicios ya estén
+   corriendo no cierra esta compuerta.
+9. **Cutover DNS a la IP de plataforma — pasa a PREMISE OBSOLETE.** El
+   cutover **ya ocurrió**, a mano en Cloudflare, no vía Terraform: el
+   commit `08cace6` (2026-07-28) marcó las nueve etiquetas
+   `platform_dns_cutover` restantes a `true` (`edge` ya lo estaba), y las
+   diez resuelven hoy a `159.195.156.57` (confirmado con
+   `dig +short <label>.apptolast.com A` el 2026-07-28); el servidor legado
+   `138.199.157.58` fue borrado por el propietario. **Esto también
+   contradice la lista de 2026-07-27** de la sección anterior, que
+   afirmaba que "no ha habido cutover". Lo que no cambia: el coordinador de
+   host-readiness sigue sin ejecutarse nunca contra la plataforma real, y
+   `scripts/terraform-safety.py` sigue rechazando sin condiciones cualquier
+   cambio Terraform hacia esa IP — de hecho el riesgo se invirtió: ahora es
+   Terraform el que, en modo `initialize`, devolvería por error los nueve
+   registros no-`edge` al servidor legado ya inexistente, porque
+   `imports.tf` no cubre el registro `edge` y el resto de la adopción
+   manual en Cloudflare todavía no está reflejada en el árbol.
+
+Ninguna de estas nueve compuertas se satisface inventando un valor,
+cableando una credencial o añadiendo un flag de bypass — la revalidación de
+2026-08-02 lo repite en los mismos términos que la versión anterior.
+
 ## Diferencia con el listado de `README.md`
 
 El listado de `README.md` ("Compuertas externas abiertas") es una versión
@@ -113,6 +196,13 @@ aprovisionó reutilizando la credencial ACME/Traefik existente, dejando solo
 la rotación ACME como pendiente real. Por eso esta página usa `CLAUDE.md`
 (fechado 2026-07-27) como fuente principal, citando expresamente los dos
 documentos.
+
+Esta comparación queda a su vez superada por la revalidación de
+2026-08-02 de la sección anterior: `README.md` no se ha tocado desde
+`63dd546` (2026-07-27) y hoy contradice el estado real en al menos el
+gate de Minecraft, así que ya no es una fuente fiable ni siquiera para el
+matiz que describe este apartado — se conserva aquí solo como registro
+histórico de la comparación, no como estado vigente.
 
 ## Cuándo escalar
 
@@ -133,6 +223,12 @@ credencial o un flag de bypass para forzar una ejecución en verde.
   `DockerSwarmInfrastrcture`: el listado de "Open STOP gates" de
   `CLAUDE.md` y la sección "Compuertas externas abiertas" de `README.md`
   conservan el mismo contenido citado arriba, sin cambios.
+- 2026-08-02 — `CLAUDE.md` revalida por completo las nueve compuertas
+  contra el commit `8a76620`: dos cambian de estado (Minecraft pasa a
+  CLOSED, cutover DNS pasa a PREMISE OBSOLETE), contradiciendo el listado
+  de 2026-07-27 citado arriba en esta misma página. Añadida la sección
+  "Revalidación completa — 2 de agosto de 2026" con el detalle de las
+  nueve compuertas.
 
 ## Referencias
 
