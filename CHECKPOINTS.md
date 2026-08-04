@@ -44,35 +44,27 @@
 
 ## C3 — Build sin advertencias nuevas
 
-- [ ] `npm run build` no imprime ninguna línea de advertencia/error nueva
+- [x] `npm run build` no imprime ninguna línea de advertencia/error nueva
       respecto al estado de esta rama.
-- **Estado verificado el 2026-08-04, antes de esta adopción:** el build
-  imprime hoy **una** advertencia preexistente, no introducida por este
-  cambio: `Entry docs → 404 was not found` (de
-  `astro/dist/content/runtime.js`, `console.warn`), porque Starlight inyecta
-  automáticamente una ruta `/404` que busca una entrada de contenido con id
-  `404` en la colección `docs`, y este repo no tiene
-  `src/content/docs/404.md`. **Corrección de honestidad:** el encargo de
-  esta adopción daba por hecho que `disable404Route` ya estaba activo en
-  `astro.config.mjs` como la disciplina de 0 advertencias ya vigente en este
-  repo — se comprobó (`grep` sobre el repo y sobre `node_modules`, y una
-  ejecución real de `npm run build`) y **no lo está**: es una opción real de
-  Starlight (`starlightConfig.disable404Route`,
-  `node_modules/@astrojs/starlight/index.ts`), pero no se usa hoy en este
-  repo, ni se menciona en ningún fichero de `TemplateSSDUncleBob` (se
-  comprobó también ahí). Se deja **sin corregir en esta PR** (no estaba en
-  su alcance declarado) para no colar un cambio de comportamiento del sitio
-  dentro de una PR de gobernanza: la página 404 actual de Starlight es funcional y
-  está estilizada (`dist/404.html`), y `disable404Route: true` la
-  eliminaría en favor del 404 genérico del hosting. Dos arreglos posibles,
-  a decidir por quien mantiene el sitio: (a) añadir un
-  `src/content/docs/404.md` mínimo (cierra la advertencia sin perder la
-  página 404 estilizada), o (b) `disable404Route: true` en
-  `astro.config.mjs` (cierra la advertencia, pierde esa página). Hasta que
-  se aplique una de las dos, este checkpoint queda **abierto** — no se
-  marca `[x]` fingiendo un build ya limpio.
-- [ ] Toda página nueva no debe añadir advertencias nuevas a las que ya
-      existen (hoy, solo la de arriba).
+- **Historial de este checkpoint:** la primera pasada de esta adopción
+  encontró que el build sí emitía una advertencia preexistente (`Entry docs
+  → 404 was not found`, de `astro/dist/content/runtime.js`) y documentó
+  honestamente que el supuesto inicial ("`disable404Route` ya activo") era
+  falso — no se fingió un build limpio. Quedaban dos arreglos posibles sobre
+  la mesa, (a) `src/content/docs/404.md` o (b) `disable404Route: true` sin
+  más, cada uno con una pérdida (un aviso distinto y peor con (a), la página
+  404 estilizada con (b) a secas).
+- **Corregido el mismo día**, combinando `disable404Route: true` en
+  `astro.config.mjs` con una página `src/pages/404.astro` propia usando
+  `<StarlightPage>` (`@astrojs/starlight/components/StarlightPage.astro`) —
+  patrón oficial documentado en
+  <https://starlight.astro.build/reference/configuration/#disable404route> y
+  <https://starlight.astro.build/guides/customization/>. Esto evita el
+  `console.warn` sin perder una página 404 estilizada (a diferencia de la
+  opción (b) tal cual). Verificado con `npm run build` a stdout/stderr
+  separados, **0 bytes en stderr**, en 3 ejecuciones consecutivas.
+- [x] Toda página nueva no debe añadir advertencias nuevas a las que ya
+      existen (hoy, ninguna).
 
 ## C4 — Enlaces internos no rotos
 
