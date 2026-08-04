@@ -54,6 +54,7 @@ export default defineConfig({
             { slug: 'catalogo-servicios' },
             { slug: 'diagnosticos-conocidos' },
             { slug: 'topologia-red' },
+            { slug: 'observabilidad-backup' },
           ],
         },
       ],
