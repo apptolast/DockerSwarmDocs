@@ -21,23 +21,24 @@ citable (`title`, `type`, `owner`, `source-of-truth`, `last-verified`,
 `related-alerts`/`see-also`), validado en build por el schema de
 `src/content.config.ts`.
 
-## Estado actual: contenido sembrado a mano, no autogenerado
+## Estado actual: sembrado a mano, mantenido por bot desde el 2026-07-30
 
-Esta primera versión del sitio es **manual** ("seed"): cada página se
-escribió y verificó a mano contra el contenido real de
+Esta primera versión del sitio se sembró de forma **manual**: cada página
+se escribió y verificó a mano contra el contenido real de
 `apptolast/DockerSwarmInfrastrcture` (README.md, CLAUDE.md, CHANGELOG.md,
 `docs/*.md`, `.claude/agents/*.md`) en el commit
 [`854e160a`](https://github.com/apptolast/DockerSwarmInfrastrcture/commit/854e160a5fa1b369f1755083f1242b50966b19b0).
-No existe todavía ningún proceso que regenere estas páginas automáticamente
-cuando cambie el repo fuente. Si un dato no se pudo verificar contra ese
-repo, la página correspondiente lo dice explícitamente en vez de rellenarlo
-con contenido inventado.
+Si un dato no se pudo verificar contra ese repo, la página correspondiente
+lo dice explícitamente en vez de rellenarlo con contenido inventado.
 
-En el futuro, el bot **`apptolast/DockerSwarmMemoria`** es quien está
-pensado para abrir Pull Requests aquí y mantener este sitio vivo (sincronizado
-con los cambios reales de `DockerSwarmInfrastrcture`), en vez de que las
-páginas se editen a mano indefinidamente. Ese bot no existe todavía en esta
-fecha: este repo se crea como el punto de partida sobre el que trabajaría.
+Desde el 2026-07-30, el bot **`apptolast/DockerSwarmMemoria`** mantiene el
+sitio vivo de verdad: lee los cambios de `DockerSwarmInfrastrcture` y abre
+Pull Requests aquí, siempre en modo borrador y siempre fusionadas por una
+persona, nunca automáticamente. Dos rondas de esas propuestas ya se han
+fusionado:
+[`#4`](https://github.com/apptolast/DockerSwarmDocs/pull/4) (2026-07-30) y
+[`#10`](https://github.com/apptolast/DockerSwarmDocs/pull/10) (2026-08-03,
+que además añadió la página `observabilidad-backup.md`).
 
 ## Compatibilidad con el futuro RAG central
 
