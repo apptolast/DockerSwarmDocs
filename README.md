@@ -21,23 +21,24 @@ citable (`title`, `type`, `owner`, `source-of-truth`, `last-verified`,
 `related-alerts`/`see-also`), validado en build por el schema de
 `src/content.config.ts`.
 
-## Estado actual: contenido sembrado a mano, no autogenerado
+## Estado actual: sembrado a mano, mantenido por bot desde el 2026-07-30
 
-Esta primera versión del sitio es **manual** ("seed"): cada página se
-escribió y verificó a mano contra el contenido real de
+Esta primera versión del sitio se sembró de forma **manual**: cada página
+se escribió y verificó a mano contra el contenido real de
 `apptolast/DockerSwarmInfrastrcture` (README.md, CLAUDE.md, CHANGELOG.md,
 `docs/*.md`, `.claude/agents/*.md`) en el commit
 [`854e160a`](https://github.com/apptolast/DockerSwarmInfrastrcture/commit/854e160a5fa1b369f1755083f1242b50966b19b0).
-No existe todavía ningún proceso que regenere estas páginas automáticamente
-cuando cambie el repo fuente. Si un dato no se pudo verificar contra ese
-repo, la página correspondiente lo dice explícitamente en vez de rellenarlo
-con contenido inventado.
+Si un dato no se pudo verificar contra ese repo, la página correspondiente
+lo dice explícitamente en vez de rellenarlo con contenido inventado.
 
-En el futuro, el bot **`apptolast/DockerSwarmMemoria`** es quien está
-pensado para abrir Pull Requests aquí y mantener este sitio vivo (sincronizado
-con los cambios reales de `DockerSwarmInfrastrcture`), en vez de que las
-páginas se editen a mano indefinidamente. Ese bot no existe todavía en esta
-fecha: este repo se crea como el punto de partida sobre el que trabajaría.
+Desde el 2026-07-30, el bot **`apptolast/DockerSwarmMemoria`** mantiene el
+sitio vivo de verdad: lee los cambios de `DockerSwarmInfrastrcture` y abre
+Pull Requests aquí, siempre en modo borrador y siempre fusionadas por una
+persona, nunca automáticamente. Dos rondas de esas propuestas ya se han
+fusionado:
+[`#4`](https://github.com/apptolast/DockerSwarmDocs/pull/4) (2026-07-30) y
+[`#10`](https://github.com/apptolast/DockerSwarmDocs/pull/10) (2026-08-03,
+que además añadió la página `observabilidad-backup.md`).
 
 ## Compatibilidad con el futuro RAG central
 
@@ -63,6 +64,24 @@ Esto implica, en particular:
   (o, dentro del cuerpo de la página, se documenta explícitamente qué fuente
   más reciente sustituye a cuál, como ocurre entre `README.md` y
   `docs/DEPLOYMENT_STATUS.md` de `DockerSwarmInfrastrcture`).
+
+## Disciplina de contribución manual (adopción de TemplateSSDUncleBob)
+
+El bot `apptolast/DockerSwarmMemoria` ya propone contenido a este repositorio
+vía Pull Request (dos rondas fusionadas hasta la fecha:
+[`#4`](https://github.com/apptolast/DockerSwarmDocs/pull/4) y
+[`#10`](https://github.com/apptolast/DockerSwarmDocs/pull/10)), siempre en
+modo borrador y siempre fusionado por una persona, nunca automáticamente.
+Además de ese bot, este repositorio adopta la disciplina de
+[`Cenit-Digital/TemplateSSDUncleBob`](https://github.com/Cenit-Digital/TemplateSSDUncleBob)
+(conversación → contrato → redacción → review → verificación) para el
+**trabajo manual** sobre `src/content/docs/`: una página nueva o una
+reestructuración que no viene ya propuesta por el bot. Ver `CLAUDE.md`,
+`AGENTS.md` y `CHECKPOINTS.md` en la raíz del repo, y la página
+[Adopción de TemplateSSDUncleBob](src/content/docs/adopcion-templatessd.md)
+para el detalle completo de cómo convive con el bot sin duplicarlo ni
+competir con él (spoiler: esta adopción no abre Pull Requests propios ni
+corre en un cron — es disciplina para quien escribe a mano).
 
 ## Despliegue: GitHub Pages
 
@@ -101,5 +120,9 @@ npm run build   # build de producción en dist/
 │   └── assets/              logo y demás activos optimizables por Astro
 ├── public/                  activos estáticos servidos tal cual (favicon)
 ├── astro.config.mjs         configuración del sitio, sidebar, i18n, site/base
+├── CLAUDE.md · AGENTS.md · CHECKPOINTS.md   gobernanza (adopción de TemplateSSDUncleBob)
+├── harness.config.json      comandos reales de este stack (build, check de enlaces…)
+├── scripts/                 sync-memoria.(sh|ps1) (memoria organizacional, opcional)
+│                             y check-internal-links.mjs (enlaces internos, cero deps)
 └── .github/workflows/       CI: build (siempre) + deploy a Pages (push a main)
 ```

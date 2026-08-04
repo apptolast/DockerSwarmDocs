@@ -1,0 +1,33 @@
+{
+  "project": "docker-swarm-docs",
+  "language": "node-astro-content",
+  "description": "Adaptación de Cenit-Digital/TemplateSSDUncleBob para un sitio de documentación Astro/Starlight (no una app con código de dominio). No se ha copiado a este repo el motor genérico .harness/harness.mjs de la plantilla ni el lanzador bin/harness: los comandos de abajo se invocan directamente (npm/node), y son el mapeo honesto que declara esta adopción. La forma del archivo sigue el mismo campo `commands` que describe docs/configuration.md de la plantilla, para que quien conozca la plantilla original reconozca el mapeo. 'lint', 'test' y 'mutate' quedan vacíos a propósito: hoy no existe script de lint ni de test en package.json, y 'mutate' no aplica a prosa/documentación (ver CHECKPOINTS.md, C7). El equivalente real de verificación de esta adopción es 'build' + el schema de frontmatter (src/content.config.ts, se ejecuta dentro de 'build') + 'check_links'.",
+  "commands": {
+    "install": "npm ci",
+    "lint": "",
+    "test": "",
+    "mutate": "",
+    "build": "npm run build",
+    "check_links": "npm run check:links"
+  },
+  "paths": {
+    "src": "src/content/docs",
+    "tests": "",
+    "features": "",
+    "progress": "",
+    "spec": "",
+    "feature_list": ""
+  },
+  "mutation": {
+    "threshold": 0,
+    "targets": [],
+    "applicable": false,
+    "reason": "Prosa/documentación Markdown: no hay código de dominio que mutar ni una suite de tests que 'muerda'. Forzar una puntuación de mutación aquí sería un teatro de verificación, no una medida real (ver CHECKPOINTS.md, C7, y src/content/docs/adopcion-templatessd.md)."
+  },
+  "rules": {
+    "one_feature_at_a_time": true,
+    "require_approved_spec_to_implement": true,
+    "require_tests_to_close": false,
+    "require_mutation_to_close": false
+  }
+}

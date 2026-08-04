@@ -36,13 +36,28 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/apptolast/DockerSwarmDocs/edit/main/',
       },
-      // Orden explícito de las 7 páginas migradas, igual al que tenían via
-      // `sidebar_position` en Docusaurus (1-7). Cada página también declara
-      // `sidebar.order` en su propio frontmatter (ver src/content/docs/*.md),
-      // que es el mecanismo oficial documentado para reordenar grupos
-      // autogenerados; aquí se listan explícitamente por `slug` para que el
-      // orden del único grupo de la barra lateral quede fijado sin depender
-      // de coincidencias de directorio.
+      // Starlight busca por defecto una página docs/404 y, si no la
+      // encuentra, emite un aviso real en cada build ("Entry docs → 404 was
+      // not found."). disable404Route desactiva esa búsqueda para usar en su
+      // lugar la página 404 propia de Astro/Starlight en src/pages/404.astro.
+      // Referencia oficial: https://starlight.astro.build/reference/configuration/#disable404route
+      disable404Route: true,
+      // Orden explícito de las páginas del sitio, igual al que tenían las 7
+      // originales via `sidebar_position` en Docusaurus. Cada página
+      // también declara `sidebar.order` en su propio frontmatter (ver
+      // src/content/docs/*.md), que es el mecanismo oficial documentado
+      // para reordenar grupos autogenerados; aquí se listan explícitamente
+      // por `slug` para que el orden del único grupo de la barra lateral
+      // quede fijado sin depender de coincidencias de directorio.
+      //
+      // `observabilidad-backup` (order: 8, añadida en el PR #10) faltaba en
+      // este array: la página existía y compilaba, pero quedaba
+      // inalcanzable desde la navegación — el mismo motivo por el que este
+      // array se mantiene explícito en vez de autogenerado.
+      //
+      // `adopcion-templatessd` (order: 9) documenta la adopción de
+      // TemplateSSDUncleBob para este repo (ver CLAUDE.md/AGENTS.md/
+      // CHECKPOINTS.md en la raíz y la propia página).
       sidebar: [
         {
           label: 'Documentación',
@@ -54,6 +69,8 @@ export default defineConfig({
             { slug: 'catalogo-servicios' },
             { slug: 'diagnosticos-conocidos' },
             { slug: 'topologia-red' },
+            { slug: 'observabilidad-backup' },
+            { slug: 'adopcion-templatessd' },
           ],
         },
       ],
