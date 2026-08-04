@@ -119,6 +119,10 @@ propietario).
   corrección de la escritura de estado silenciosa y el hueco de alertas de
   "estado obsoleto" que sigue abierto en tres de los cuatro tipos de
   backup.
+- [Adopción de TemplateSSDUncleBob](../adopcion-templatessd/) — la
+  disciplina de contrato de frontmatter y verificación que rige el trabajo
+  manual sobre `src/content/docs/`, y cómo convive con el bot
+  `DockerSwarmMemoria` sin duplicarlo.
 
 ## Histórico relevante
 

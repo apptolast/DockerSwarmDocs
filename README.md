@@ -64,6 +64,24 @@ Esto implica, en particular:
   más reciente sustituye a cuál, como ocurre entre `README.md` y
   `docs/DEPLOYMENT_STATUS.md` de `DockerSwarmInfrastrcture`).
 
+## Disciplina de contribución manual (adopción de TemplateSSDUncleBob)
+
+El bot `apptolast/DockerSwarmMemoria` ya propone contenido a este repositorio
+vía Pull Request (dos rondas fusionadas hasta la fecha:
+[`#4`](https://github.com/apptolast/DockerSwarmDocs/pull/4) y
+[`#10`](https://github.com/apptolast/DockerSwarmDocs/pull/10)), siempre en
+modo borrador y siempre fusionado por una persona, nunca automáticamente.
+Además de ese bot, este repositorio adopta la disciplina de
+[`Cenit-Digital/TemplateSSDUncleBob`](https://github.com/Cenit-Digital/TemplateSSDUncleBob)
+(conversación → contrato → redacción → review → verificación) para el
+**trabajo manual** sobre `src/content/docs/`: una página nueva o una
+reestructuración que no viene ya propuesta por el bot. Ver `CLAUDE.md`,
+`AGENTS.md` y `CHECKPOINTS.md` en la raíz del repo, y la página
+[Adopción de TemplateSSDUncleBob](src/content/docs/adopcion-templatessd.md)
+para el detalle completo de cómo convive con el bot sin duplicarlo ni
+competir con él (spoiler: esta adopción no abre Pull Requests propios ni
+corre en un cron — es disciplina para quien escribe a mano).
+
 ## Despliegue: GitHub Pages
 
 Este sitio se publica en **GitHub Pages** en
@@ -101,5 +119,9 @@ npm run build   # build de producción en dist/
 │   └── assets/              logo y demás activos optimizables por Astro
 ├── public/                  activos estáticos servidos tal cual (favicon)
 ├── astro.config.mjs         configuración del sitio, sidebar, i18n, site/base
+├── CLAUDE.md · AGENTS.md · CHECKPOINTS.md   gobernanza (adopción de TemplateSSDUncleBob)
+├── harness.config.json      comandos reales de este stack (build, check de enlaces…)
+├── scripts/                 sync-memoria.(sh|ps1) (memoria organizacional, opcional)
+│                             y check-internal-links.mjs (enlaces internos, cero deps)
 └── .github/workflows/       CI: build (siempre) + deploy a Pages (push a main)
 ```

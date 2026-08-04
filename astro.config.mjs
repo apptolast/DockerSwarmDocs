@@ -48,6 +48,10 @@ export default defineConfig({
       // este array: la página existía y compilaba, pero quedaba
       // inalcanzable desde la navegación — el mismo motivo por el que este
       // array se mantiene explícito en vez de autogenerado.
+      //
+      // `adopcion-templatessd` (order: 9) documenta la adopción de
+      // TemplateSSDUncleBob para este repo (ver CLAUDE.md/AGENTS.md/
+      // CHECKPOINTS.md en la raíz y la propia página).
       sidebar: [
         {
           label: 'Documentación',
@@ -60,6 +64,7 @@ export default defineConfig({
             { slug: 'diagnosticos-conocidos' },
             { slug: 'topologia-red' },
             { slug: 'observabilidad-backup' },
+            { slug: 'adopcion-templatessd' },
           ],
         },
       ],
