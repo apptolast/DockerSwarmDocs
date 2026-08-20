@@ -2,8 +2,8 @@
 title: "Catálogo de servicios aprobados"
 type: service
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/SERVICE_CATALOG.md y config/services.yml, commit 45249ebb"
-last-verified: 2026-07-30
+source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/SERVICE_CATALOG.md y config/services.yml, commit 45249ebb; excepción tracked-tag re-verificada contra config/workload-image-updates.yml, commit f91c6e9 (2026-08-20)"
+last-verified: 2026-08-20
 tags:
   - swarm
   - servicios
@@ -14,13 +14,15 @@ superseded-by: null
 depends-on:
   - "policy:compuertas-abiertas"
 used-by: []
-related-runbooks: []
+related-runbooks:
+  - "runbook:actualizacion-imagen-alberto"
 related-dashboards: []
 related-alerts: []
 see-also:
   - "architecture:introduccion"
   - "infrastructure:estado-observado"
   - "policy:compuertas-abiertas"
+  - "runbook:actualizacion-imagen-alberto"
 sidebar:
   order: 5
 ---
@@ -103,6 +105,20 @@ Añadir una carga denegada a un stack, aunque su imagen exista o su namespace
 aparezca en un backup, es un cambio de alcance y requiere modificar
 `config/services.yml` de forma explícita.
 
+## Excepción operativa: tracked-tag de `personal-website-alberto`
+
+Desde el commit `f91c6e9` (2026-08-20, PR
+[`#21`](https://github.com/apptolast/DockerSwarmInfrastrcture/pull/21)),
+`personal-website-alberto` sigue conservando su digest histórico en este
+catálogo, pero es el único servicio con permiso para actualizarse siguiendo
+la etiqueta mutable `docker.io/hgarciaalberto/personal-website:latest` bajo
+un contrato separado (`config/workload-image-updates.yml`,
+`update_policy: tracked-tag`) que exige revisión humana del digest antes de
+cada actualización y falla en seco si el registro remoto ya no coincide con
+lo aprobado. Ningún otro servicio del catálogo tiene esta excepción; todos
+los demás siguen fijados por digest sin tag mutable alguno. Detalle completo
+en [Runbook: la excepción tracked-tag de la imagen de Alberto](../actualizacion-imagen-alberto/).
+
 ## Observabilidad interna
 
 Prometheus, Alertmanager, Blackbox Exporter, Loki, Alloy, Grafana, Node
@@ -135,6 +151,9 @@ declarados en las fuentes actuales de plataforma.
   propietario.
 - 2026-07-30 — Esta página creada, verificada contra el commit `45249ebb`
   de `DockerSwarmInfrastrcture`.
+- 2026-08-20 — Documentada la excepción operativa `tracked-tag` de
+  `personal-website-alberto`, introducida en el commit `f91c6e9`
+  (PR [`#21`](https://github.com/apptolast/DockerSwarmInfrastrcture/pull/21)).
 
 ## Referencias
 
