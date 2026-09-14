@@ -3,7 +3,7 @@ title: "Topología de red y aislamiento de edge"
 type: network
 owner: PabloHurtadoGonzalo86
 source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/ARCHITECTURE.md secciones 'Contrato compartido', 'Topología' y 'Aislamiento de red y edge'; config/platform.yml, commit 45249ebb; ansible/roles/host_baseline/defaults/main.yml, ansible/roles/host_baseline/tasks/crowdsec-docker.yml, ansible/roles/host_baseline/templates/crowdsec-ipset-ready.sh.j2, ansible/roles/host_baseline/templates/docker-firewall-crowdsec.conf.j2, ansible/roles/platform/files/dockerswarm-docker-firewall.service, tests/test_crowdsec_ipset_ready.py, commits 501e6ea y 54cb10a"
-last-verified: 2026-07-30
+last-verified: 2026-09-14
 tags:
   - swarm
   - red
@@ -15,7 +15,8 @@ status: stable
 superseded-by: null
 depends-on:
   - "service:catalogo-servicios"
-used-by: []
+used-by:
+  - "service:organizationweb"
 related-runbooks: []
 related-dashboards: []
 related-alerts: []
@@ -24,6 +25,7 @@ see-also:
   - "infrastructure:estado-observado"
   - "architecture:agentes-operadores"
   - "service:catalogo-servicios"
+  - "service:organizationweb"
 sidebar:
   order: 7
 ---
@@ -114,6 +116,21 @@ limpio, Passbolt, el portfolio de Pablo, el portfolio de Alberto, y Shlink
 cada uno). Minecraft no pasa por Traefik en ningún caso; su publicación TCP
 directa sigue desactivada por el gate descrito arriba.
 
+## Red edge dedicada para OrganizationWeb
+
+Fuera del contrato de `config/platform.yml` descrito arriba,
+`config/organizationweb.yml` declara una red overlay edge propia,
+`apptolast-edge-organizationweb`, cifrada y no attachable, igual en
+naturaleza a las demás redes aisladas por workload. Según
+`docs/ORGANIZATIONWEB.md`, el playbook `edge` crea únicamente esa red
+adicional y un router file-provider para `organizacion.apptolast.com`,
+conservando los ocho routers y redes legacy existentes y los Configs
+anteriores de Traefik para rollback; `organizationweb` necesita esa red
+creada antes de su propio `--check`. Por separado, el stack `autoupdater`
+(ver [Actualización automática por canales de imagen](../automatizacion-imagenes/))
+usa su propia red overlay no attachable, para que el vigilante Shepherd
+salga a Docker Hub sin compartir red con ningún workload HTTP.
+
 ## Orden de arranque: CrowdSec antes que el firewall de Docker
 
 El rol `host_baseline` instala en `dockerswarm-docker-firewall.service`
@@ -173,6 +190,10 @@ drop-in conservan sus capacidades declaradas.
   el firewall de Docker", verificada contra los commits `501e6ea` ("Wait
   for CrowdSec ipsets before Docker firewall") y `54cb10a` ("Enable Docker
   firewall with Docker service") de `DockerSwarmInfrastrcture`.
+- 2026-09-14 — Añadida la sección "Red edge dedicada para
+  OrganizationWeb", verificada contra `config/organizationweb.yml` y
+  `docs/ORGANIZATIONWEB.md` (commit `5ba4f11`), y la mención de la red
+  propia del stack `autoupdater`.
 
 ## Referencias
 
@@ -181,3 +202,5 @@ drop-in conservan sus capacidades declaradas.
 - [`ansible/roles/host_baseline/tasks/crowdsec-docker.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/ansible/roles/host_baseline/tasks/crowdsec-docker.yml)
 - [`ansible/roles/host_baseline/templates/crowdsec-ipset-ready.sh.j2`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/ansible/roles/host_baseline/templates/crowdsec-ipset-ready.sh.j2)
 - [`ansible/roles/platform/files/dockerswarm-docker-firewall.service`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/ansible/roles/platform/files/dockerswarm-docker-firewall.service)
+- [`docs/ORGANIZATIONWEB.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/docs/ORGANIZATIONWEB.md)
+- [`config/organizationweb.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/config/organizationweb.yml)

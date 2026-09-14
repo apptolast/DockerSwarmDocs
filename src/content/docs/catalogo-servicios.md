@@ -3,7 +3,7 @@ title: "Catálogo de servicios aprobados"
 type: service
 owner: PabloHurtadoGonzalo86
 source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/SERVICE_CATALOG.md y config/services.yml, commit 45249ebb"
-last-verified: 2026-07-30
+last-verified: 2026-09-14
 tags:
   - swarm
   - servicios
@@ -21,6 +21,8 @@ see-also:
   - "architecture:introduccion"
   - "infrastructure:estado-observado"
   - "policy:compuertas-abiertas"
+  - "service:organizationweb"
+  - "infrastructure:automatizacion-imagenes"
 sidebar:
   order: 5
 ---
@@ -103,6 +105,18 @@ Añadir una carga denegada a un stack, aunque su imagen exista o su namespace
 aparezca en un backup, es un cambio de alcance y requiere modificar
 `config/services.yml` de forma explícita.
 
+## Fuera de alcance de este catálogo
+
+`config/organizationweb.yml` gobierna un stack aparte,
+[OrganizationWeb](../organizationweb/), desplegado por primera vez el
+2026-09-07 (PR29, commit `5607afc`) — no forma parte de esta migración ni
+de su marcador de restauración, y no se añade a la tabla anterior. El
+sistema de actualización automática por canales de imagen
+(`config/image-channels.yml`, stack `autoupdater`) tampoco es un servicio
+migrado: gobierna cómo se actualizan las imágenes de los servicios de este
+catálogo y de OrganizationWeb; ver
+[Actualización automática por canales de imagen](../automatizacion-imagenes/).
+
 ## Observabilidad interna
 
 Prometheus, Alertmanager, Blackbox Exporter, Loki, Alloy, Grafana, Node
@@ -135,6 +149,10 @@ declarados en las fuentes actuales de plataforma.
   propietario.
 - 2026-07-30 — Esta página creada, verificada contra el commit `45249ebb`
   de `DockerSwarmInfrastrcture`.
+- 2026-09-14 — Añadida la sección "Fuera de alcance de este catálogo",
+  enlazando OrganizationWeb y el modelo de canales de imagen; ninguno de
+  los dos altera `config/services.yml` ni la tabla de servicios aprobados
+  anterior.
 
 ## Referencias
 
