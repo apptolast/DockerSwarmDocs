@@ -2,7 +2,7 @@
 title: "Catálogo de servicios aprobados"
 type: service
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/SERVICE_CATALOG.md y config/services.yml, commit 45249ebb"
+source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/SERVICE_CATALOG.md y config/services.yml, commit 45249ebb; sección 'Fuera de alcance de este catálogo': docs/SERVICE_CATALOG.md (cambiado en 2bb9a39), config/organizationweb.yml, config/image-channels.yml, docs/ORGANIZATIONWEB.md y docs/AUTOUPDATE.md, commit 44469bf"
 last-verified: 2026-09-14
 tags:
   - swarm
@@ -109,12 +109,17 @@ aparezca en un backup, es un cambio de alcance y requiere modificar
 
 `config/organizationweb.yml` gobierna un stack aparte,
 [OrganizationWeb](../organizationweb/), desplegado por primera vez el
-2026-09-07 (PR29, commit `5607afc`) — no forma parte de esta migración ni
+2026-09-07 con el catálogo `491e2c2`, que PR29 incorporó a main como
+`5607afc` — no forma parte de esta migración ni
 de su marcador de restauración, y no se añade a la tabla anterior. El
 sistema de actualización automática por canales de imagen
 (`config/image-channels.yml`, stack `autoupdater`) tampoco es un servicio
-migrado: gobierna cómo se actualizan las imágenes de los servicios de este
-catálogo y de OrganizationWeb; ver
+migrado: gobierna qué imagen ejecutan los servicios renderizados por los
+stacks `edge`, `workloads`, `organizationweb` y `observability`. Desde el
+commit `2bb9a39`, `docs/SERVICE_CATALOG.md` lo describe como un contrato
+operativo separado que apunta a cada baseline de este catálogo, de modo que
+una actualización de imagen nunca cambia el hash de `config/services.yml`;
+ver
 [Actualización automática por canales de imagen](../automatizacion-imagenes/).
 
 ## Observabilidad interna
@@ -152,9 +157,11 @@ declarados en las fuentes actuales de plataforma.
 - 2026-09-14 — Añadida la sección "Fuera de alcance de este catálogo",
   enlazando OrganizationWeb y el modelo de canales de imagen; ninguno de
   los dos altera `config/services.yml` ni la tabla de servicios aprobados
-  anterior.
+  anterior. Sección verificada contra el commit `44469bf`.
 
 ## Referencias
 
 - [`docs/SERVICE_CATALOG.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/docs/SERVICE_CATALOG.md)
 - [`config/services.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/config/services.yml)
+- [`config/image-channels.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/config/image-channels.yml)
+- [`docs/ORGANIZATIONWEB.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/docs/ORGANIZATIONWEB.md)

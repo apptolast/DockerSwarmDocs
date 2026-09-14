@@ -38,7 +38,11 @@ sidebar:
 El owner decidió el 2026-09-11 que todo servicio Swarm, actual o futuro, se
 actualiza desde un **canal revisado** en Git en lugar de un digest revisado:
 las imágenes propias del owner siguen `:latest`; las bases de datos y colas
-de terceros siguen un canal de versión mayor fijado. Esto reinterpreta la
+de terceros siguen, como política, un canal de versión mayor fijado. A fecha
+de `last-verified` esa política no es todavía el estado: todas las bases de
+datos y colas de `config/image-channels.yml` siguen fijadas por digest (hold,
+`autoupdate: false`); solo Traefik, también de clase `stateful-major`, sigue
+ya su canal `v3`. Esto reinterpreta la
 regla de oro de `DockerSwarmInfrastrcture` ("un servidor perdido se
 reconstruye desde un commit revisado más secretos y backups externos"): la
 reconstrucción ahora descarga la cabeza actual de cada canal, no bytes
@@ -84,12 +88,13 @@ corría en el host sin revisar (`IGNORELIST_SERVICES`, `SLEEP_TIME=20m`, sin
 filtro por etiqueta). Contrato completo en `config/autoupdater.yml`:
 
 - **Imagen**: `containrrr/shepherd:v1.8.1`, fijada por digest,
-  `resolve_image: never`; es la única exclusión del mapa de canales — nunca
-  se actualiza a sí mismo.
+  `resolve_image: never`. Es una de las dos exclusiones del mapa de canales
+  (la otra es `workloads/n8n-runners`, construida en local); nunca se
+  actualiza a sí mismo y su etiqueta `apptolast.autoupdate` vale `"false"`.
 - **Entorno**: `FILTER_SERVICES=label=apptolast.autoupdate=true`,
-  `SLEEP_TIME=1h`, `TIMEOUT=900`, `REGISTRY_USER=ocholoko888`,
-  `WITH_REGISTRY_AUTH=true`, `TZ=UTC`. `SLEEP_TIME=1h` (frente a los `20m`
-  del vigilante sin revisar) se eligió para no agotar el límite de 200
+  `SLEEP_TIME=1h`, `TIMEOUT=900`, `VERBOSE=true`,
+  `REGISTRY_USER=ocholoko888`, `WITH_REGISTRY_AUTH=true`, `TZ=UTC`.
+  `SLEEP_TIME=1h` (frente a los `20m` del vigilante sin revisar) se eligió para no agotar el límite de 200
   descargas/6h de una cuenta gratuita de Docker Hub autenticada.
 - **Credencial**: contraseña de `/run/secrets/shepherd_registry_password`,
   montada desde el secret externo `autoupdater-dockerhub-pat-v1`
@@ -120,9 +125,13 @@ anterior (`30s`) el contenedor reintentaba la misma cabeza rota cada 30
 segundos, agotando peticiones de Docker Hub. Es una mitigación, no un
 arreglo de raíz — mientras la cabeza siga rota, hay un intento cada hora
 (con su corte de servicio) y ninguna alerta avisa porque `observability` no
-está en el perfil de capacidad activo hoy (ver más abajo).
+está en el perfil de capacidad activo hoy (ver
+[OrganizationWeb](../organizationweb/), sección «Perfil de capacidad»).
 
-## Servicios activados (commit `5e974ce`, 2026-09-13/14)
+## Servicios activados (commit `5e974ce`, 2026-09-14)
+
+El registro del vigilante se aplicó el 2026-09-13 desde `6594913`; la
+activación de canales llegó después, con `5e974ce`.
 
 Pasan a `autoupdate: true`: `workloads/kropia`,
 `workloads/portfolio-alberto`, `workloads/portfolio-pablo` (imágenes
@@ -134,8 +143,10 @@ así que una imagen mala no deja nada que restaurar — el rollback de Swarm
 minutos sin servicio por intento.
 
 Siguen deliberadamente en `autoupdate: false`: `minecraft` (formato del
-mundo), `passbolt`, `shlink`, y `organizationweb` `backend`/`web`
-(migraciones de esquema, sin backup fuera del host — ver
+mundo), `passbolt`, `shlink` y `organizationweb` `backend` (migraciones de
+esquema), y `organizationweb` `web` (avanza junto a su `backend`); ninguna
+de esas actualizaciones se deshace sin backup y no hay copia fuera del host
+(ver
 [Compuertas abiertas](../compuertas-abiertas/), gate 5, y
 [OrganizationWeb](../organizationweb/)); `openclaw` y `n8n` siguen en hold
 de versión; Traefik queda fuera por su radio de impacto (un fallo corta los
@@ -175,15 +186,16 @@ diez hosts).
 
 ## Histórico relevante
 
-- 2026-09-11 — Decisión del owner de adoptar el modelo de canales; commit
-  `2bb9a39` ("feat: render every swarm service from reviewed image
-  channels (#42)") introduce `config/image-channels.yml` y los
-  validadores/resolvers asociados.
+- 2026-09-11 — Decisión del owner de adoptar el modelo de canales.
+- 2026-09-12 (23:12 UTC) — Commit `2bb9a39` ("feat: render every swarm
+  service from reviewed image channels (#42)") introduce
+  `config/image-channels.yml` y los validadores/resolvers asociados.
 - 2026-09-13 — Commit `e920338` registra en Git el stack `autoupdater`
   (Shepherd). Commit `6594913` ("fix: resolve oci image indexes that omit
   their media type (#44)") corrige `resolve-image-channel.py` para índices
-  OCI sin `mediaType`.
-- 2026-09-13/14 — Commit `5e974ce` activa `autoupdate: true` en los cinco
+  OCI sin `mediaType`. Registro aplicado ese mismo día desde `6594913`
+  (`autoupdater`, `edge`, `workloads` y `organizationweb`).
+- 2026-09-14 — Commit `5e974ce` activa `autoupdate: true` en los cinco
   canales sin datos propios ni migraciones de esquema.
 - 2026-09-14 — Commit `44469bf` cambia el `restart_policy.delay` del
   vigilante a 1h tras identificar el crash por `PreviousSpec` nulo

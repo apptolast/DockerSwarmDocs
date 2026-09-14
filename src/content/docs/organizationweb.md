@@ -2,7 +2,7 @@
 title: "OrganizationWeb: aplicación desplegada de forma independiente"
 type: service
 owner: PabloHurtadoGonzalo86
-source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/ORGANIZATIONWEB.md, config/organizationweb.yml, config/capacity-profiles.yml, commits 5607afc, 5ba4f11 (2026-09-07 a 2026-09-11)"
+source-of-truth: "apptolast/DockerSwarmInfrastrcture docs/ORGANIZATIONWEB.md, config/organizationweb.yml, config/capacity-profiles.yml, config/image-channels.yml, stacks/organizationweb/stack.yml.j2, docs/AUTOUPDATE.md, commits 5607afc, 5ba4f11, 2bb9a39, e920338 y 44469bf (2026-09-07 a 2026-09-14)"
 last-verified: 2026-09-14
 tags:
   - swarm
@@ -53,21 +53,26 @@ release-por-release de esa fuente.
 | Campo | Valor |
 | --- | --- |
 | `hostname` | `organizacion.apptolast.com` |
-| `edge_network` | `apptolast-edge-organizationweb` (red overlay cifrada dedicada, no attachable) |
+| `edge_network` | `apptolast-edge-organizationweb` (red overlay cifrada dedicada, no attachable; la declara `ansible/group_vars/all.yml` y la crea el rol `edge`, ver [Topología de red](../topologia-red/)) |
 | `data_root` | `/srv/organizationweb` |
 | Servicios | `backend`, `web`, `postgres`, `rabbitmq` |
 | Release declarado | `2ac34cd64d40c744215f5775d0cbd1b382791db0` |
 
 <!-- markdownlint-enable MD013 -->
 
-`backend` y `web` fijan su imagen por digest OCI (`ocholoko888/organizationweb-api`,
-`ocholoko888/organizationweb-web`); `postgres` y `rabbitmq` fijan la suya
-también por digest, gobernados como entradas `hold`/`stateful-major` del
-modelo de canales (ver
+Desde el commit `2bb9a39` (#42), la imagen que ejecuta cada servicio no sale
+de `config/organizationweb.yml` sino de `config/image-channels.yml`, que
+`stacks/organizationweb/stack.yml.j2` renderiza: `backend`
+(`docker.io/ocholoko888/organizationweb-api:latest`) y `web`
+(`docker.io/ocholoko888/organizationweb-web:latest`) siguen su canal
+`:latest`, clase `owner`; `postgres` y `rabbitmq` están en hold base por
+digest, clase `stateful-major` (ver
 [Actualización automática por canales de imagen](../automatizacion-imagenes/)).
-`backend` y `web` permanecen deliberadamente en `autoupdate: false` porque
-sus actualizaciones aplican migraciones de esquema (Flyway) que Swarm no
-revierte, y no hay backup fuera del host todavía (STOP gate 5, ver
+Los digests de `images` en `config/organizationweb.yml` quedan solo como
+baseline revisado y evidencia de restauración. Los cuatro servicios están en
+`autoupdate: false`: `backend` porque sus actualizaciones aplican migraciones
+de esquema (Flyway) que Swarm no revierte, y `web` porque avanza junto a su
+`backend`; no hay backup fuera del host todavía (STOP gate 5, ver
 [Compuertas abiertas](../compuertas-abiertas/)).
 
 **TODO: verificar** — `docs/ORGANIZATIONWEB.md` describe el release
@@ -99,9 +104,10 @@ stacks) queda declarado pero no activo.
 Todos los secrets de `OrganizationWeb` son externos, creados a mano por el
 operador fuera de Git, con las etiquetas
 `com.apptolast.managed-by=manual-bootstrap` y
-`com.apptolast.purpose=organizationweb`, y son inmutables — una rotación
-crea un secret `-v2` nuevo y actualiza la referencia, nunca sobrescribe el
-existente:
+`com.apptolast.purpose=organizationweb`, y son objetos inmutables: si alguno
+ya existe no se sustituyen credenciales ni se recrea una mitad del conjunto
+con passwords nuevos. **TODO: verificar** — la fuente no documenta ningún
+procedimiento de rotación (ni un sufijo `-v2`):
 
 - `organizationweb-db-username-v1`, `organizationweb-db-password-v1`
 - `organizationweb-auth-username-v1`, `organizationweb-auth-password-v1`
@@ -132,10 +138,16 @@ restaura automáticamente una copia antigua sobre escrituras posteriores.
   catálogo `491e2c2`.
 - 2026-09-11 — Catálogo actualizado a la revisión de aplicación `2ac34cd`
   (commit `5ba4f11`), con diez migraciones Flyway nuevas (V22–V32).
-- 2026-09-14 — Esta página creada, verificada contra el commit `5ba4f11`
+- 2026-09-12 (23:12 UTC) — Commit `2bb9a39` (#42): las imágenes de
+  `backend` y `web` pasan a salir del canal `:latest` de
+  `config/image-channels.yml`.
+- 2026-09-13 — Commit `e920338` (#43) añade el stack `autoupdater` al perfil
+  de capacidad (3000m / 6802 MiB de reservas, 14600m / 11501 MiB de límites).
+- 2026-09-14 — Esta página creada, verificada contra el commit `44469bf`
   de `DockerSwarmInfrastrcture`; el histórico completo release-por-release
-  (releases 20 a 24, con su evidencia de aceptación HTTPS, backups y
-  restauraciones probadas) permanece únicamente en
+  (releases 20 a 23 con su evidencia de aceptación, más la sección del
+  release `2ac34cd`, candidato sin aceptación registrada) permanece
+  únicamente en
   `docs/ORGANIZATIONWEB.md` del repositorio fuente, no duplicado aquí.
 
 ## Referencias
@@ -143,3 +155,5 @@ restaura automáticamente una copia antigua sobre escrituras posteriores.
 - [`docs/ORGANIZATIONWEB.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/docs/ORGANIZATIONWEB.md)
 - [`config/organizationweb.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/config/organizationweb.yml)
 - [`config/capacity-profiles.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/config/capacity-profiles.yml)
+- [`config/image-channels.yml`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/config/image-channels.yml)
+- [`docs/AUTOUPDATE.md`](https://github.com/apptolast/DockerSwarmInfrastrcture/blob/main/docs/AUTOUPDATE.md)
